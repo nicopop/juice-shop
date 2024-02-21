@@ -10,12 +10,28 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- checkout: self
+  fetchDepth: 0
 - task: NodeTool@0
   inputs:
     versionSpec: '18.x'
   displayName: 'Install Node.js'
-
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'sc-SonarCloud'
+    organization: 'das3-vincentm'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: 'DAS3-VincentM_Juice-Shop-Private'
+    cliProjectName: 'Juice-Shop-Private'
+    cliSources: '.'
 - script: |
     npm install
   # npm run build
   displayName: 'npm install and build'
+- task: SonarCloudAnalyze@1
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
+- task: SonarCloudPublish@1
+  inputs:
+    pollingTimeoutSec: '300'
